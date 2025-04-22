@@ -6,10 +6,18 @@ User = get_user_model()
 
 
 class Hashtag(models.Model):
+    """
+    ....
+    """
+
     name = models.CharField(max_length=50, unique=True)
 
 
 class Post(models.Model):
+    """
+    ...
+    """
+
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     content = models.TextField()

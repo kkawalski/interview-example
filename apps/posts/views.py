@@ -1,7 +1,7 @@
 from rest_framework import generics
 
-from posts.serializers import PostSerializer
-from posts.services import PostService
+from apps.posts.serializers import PostSerializer
+from apps.posts.services import PostService
 
 
 class PostListCreateAPI(generics.ListCreateAPIView):

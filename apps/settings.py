@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+from apps.config import CONFIG
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -30,6 +32,10 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+CUSTOM_APPS = [
+    'apps.posts',
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,10 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
     'rest_framework',
-    
-    'posts',
+    *CUSTOM_APPS
 ]
 
 MIDDLEWARE = [
@@ -79,11 +83,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME':  "postgres",
-        'USER': "postgres",
-        'PASSWORD': "postgres",
-        'HOST': "localhost",
-        'PORT': "5444",
+        'NAME':  CONFIG.postgresql.name,
+        'USER': CONFIG.postgresql.user,
+        'PASSWORD': CONFIG.postgresql.password,
+        'HOST': CONFIG.postgresql.host,
+        'PORT': CONFIG.postgresql.port,
     }
 }
 
@@ -141,8 +145,8 @@ CACHES = {
 
 
 # Celery
-CELERY_BROKER_URL = "redis://localhost:6333"
-CELERY_RESULT_BACKEND = "redis://localhost:6333"
+CELERY_BROKER_URL = CONFIG.celery.broker_url
+CELERY_RESULT_BACKEND = CONFIG.celery.result_backend
 
 
 # DRF

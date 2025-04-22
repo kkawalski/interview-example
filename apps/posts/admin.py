@@ -1,6 +1,6 @@
 from django.contrib.admin import ModelAdmin, register
 
-from posts.models import Post, Hashtag
+from apps.posts.models import Post, Hashtag
 
 
 @register(Post)
