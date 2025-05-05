@@ -9,6 +9,6 @@ from apps.posts.tasks import publish_scheduled_post
 def schedule_post(sender, instance: Post, created: bool, **kwargs):
     if created and instance.publish_at and not instance.is_published:
         publish_scheduled_post.apply_async(
-            args=[instance.id], 
-            eta=instance.publish_at
+            args=[instance.id],
+            eta=instance.publish_at,
         )
