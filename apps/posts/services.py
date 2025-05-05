@@ -1,21 +1,25 @@
 from django.core.cache import cache
+from rest_framework import exceptions
 
-from posts.models import Hashtag, Post
-from posts.utils.hashtags import extract_hashtags
+from apps.posts.models import Hashtag, Post
+from apps.posts.utils.hashtags import extract_hashtags
 
 
 class PostService:
     @staticmethod
     def create_post(author, title, content, publish_at=None):
-        post = Post.objects.create(
-            author=author,
-            title=title,
-            content=content,
-            publish_at=publish_at,
-            is_published=publish_at is None,
-        )
+        try:
+            post: Post = Post.objects.create(
+                author=author,
+                title=title,
+                content=content,
+                publish_at=publish_at,
+                is_published=publish_at is None,
+            )
+        except Exception:
+            raise exceptions.ValidationError({"detail": "..."})
         post.hashtags.set((Hashtag.objects.create(name=name) for name in extract_hashtags(content)))
-        post.save()
+        # post.save()
         cache.delete('published_posts')
         return post
 

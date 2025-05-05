@@ -1,6 +1,6 @@
 from django.urls import path
 
-from posts.views import PostListCreateAPI
+from apps.posts.views import PostListCreateAPI
 
 
 urlpatterns = [

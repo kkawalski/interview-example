@@ -1,8 +1,8 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from posts.models import Post
-from posts.tasks import publish_scheduled_post
+from apps.posts.models import Post
+from apps.posts.tasks import publish_scheduled_post
 
 
 @receiver(post_save, sender=Post)
