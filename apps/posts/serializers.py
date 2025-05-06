@@ -9,3 +9,4 @@ class PostSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=200)
     content = serializers.CharField()
     publish_at = serializers.DateTimeField(required=False)
+    author = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())

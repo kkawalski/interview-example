@@ -31,8 +31,7 @@ class Redis(BaseConfiguration):
     """
     Переменные окружения Redis.
     """
-
-    port: str
+    url: str
 
 
 class Settings(BaseSettings):
@@ -42,6 +41,7 @@ class Settings(BaseSettings):
 
     celery: Celery
     postgresql: PostgreSQL
+    redis: Redis
 
     class Config:
         extra = "ignore"
