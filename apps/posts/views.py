@@ -13,5 +13,6 @@ class PostListCreateAPI(generics.ListCreateAPIView):
 
     def perform_create(self, serializer: PostSerializer):
         PostService.create_post(
+            author=self.request.user,
             **serializer.validated_data
         )
