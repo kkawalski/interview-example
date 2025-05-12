@@ -154,3 +154,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20
 }
+
+MINUTES = 60
+
+CACHE_TIMEOUT_PUBLISHED_POSTS = 15 * MINUTES
