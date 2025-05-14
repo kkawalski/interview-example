@@ -9,7 +9,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8888:8000"
+      - "8001:8000"
     depends_on:
       - postgres
       - redis
