@@ -1,10 +1,13 @@
 from django.db import models
+
+# TODO: ...
 from django.contrib.auth import get_user_model
 
 
 User = get_user_model()
 
 
+# TODO: ...
 class Hashtag(models.Model):
     """
     Represents a hashtag that can be associated with posts.
