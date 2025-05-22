@@ -36,6 +36,11 @@ class Post(models.Model):
     def __str__(self):
         return f"Post(id={self.id}, title='{self.title}')"
 
+    # 1. class Meta
+    # 2. is_published is bool field. I think in most cases Selectivity will wrong.
+    # 3. same as is_published. I think in most cases Selectivity will wrong, because we use __lte filter.
+    # In my opinion, in 2 and 3 cases postgresql will be use Parallel seq scan
+    # https://www.postgresql.org/docs/current/index-cost-estimation.html
     indexes = [
-        models.Index(fields=['is_published', 'publish_at']),
+        models.Index(fields=["is_published", "publish_at"]),
     ]
