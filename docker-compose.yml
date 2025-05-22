@@ -1,5 +1,9 @@
 version: "3.9"
 
+# Could we use gunicorn ?
+# https://docs.gunicorn.org/en/latest/run.html
+# Create gunicorn.dev.py for config 
+# https://docs.gunicorn.org/en/latest/configure.html#configuration
 services:
   app:
     build: .
