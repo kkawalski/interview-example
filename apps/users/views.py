@@ -12,7 +12,10 @@ from .services import AuthService
 
 User = get_user_model()
 
-@api_view(['POST'])
+
+# Maybe we can use CreateAPIView here insted of api_view
+# https://www.django-rest-framework.org/api-guide/generic-views/#createapiview
+@api_view(["POST"])
 @permission_classes([AllowAny])
 def register(request):
     """
@@ -23,39 +26,47 @@ def register(request):
         try:
             user = AuthService.create_user(serializer.validated_data)
             refresh = RefreshToken.for_user(user)
-            return Response({
-                'user': serializer.data,
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "user": serializer.data,
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                },
+                status=status.HTTP_201_CREATED,
+            )
         except ValidationError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
+
+@api_view(["POST"])
 @permission_classes([AllowAny])
 def login(request):
     """
     Аутентификация пользователя
     """
+    # try to use django.contrib.auth.authenticate()
     serializer = UserLoginSerializer(data=request.data)
     if serializer.is_valid():
         try:
             user = AuthService.authenticate_user(
-                email=serializer.validated_data['email'],
-                password=serializer.validated_data['password']
+                email=serializer.validated_data["email"],
+                password=serializer.validated_data["password"],
             )
             refresh = RefreshToken.for_user(user)
-            return Response({
-                'user': UserRegistrationSerializer(user).data,
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            })
+            return Response(
+                {
+                    "user": UserRegistrationSerializer(user).data,
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                }
+            )
         except ValidationError as e:
-            return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
+
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def logout(request):
     """
@@ -69,7 +80,8 @@ def logout(request):
     except Exception:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
+
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def refresh_token(request):
     """
@@ -78,8 +90,10 @@ def refresh_token(request):
     try:
         refresh_token = request.data["refresh"]
         token = RefreshToken(refresh_token)
-        return Response({
-            'access': str(token.access_token),
-        })
+        return Response(
+            {
+                "access": str(token.access_token),
+            }
+        )
     except Exception:
-        return Response(status=status.HTTP_400_BAD_REQUEST) 
+        return Response(status=status.HTTP_400_BAD_REQUEST)

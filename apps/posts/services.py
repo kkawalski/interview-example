@@ -29,8 +29,7 @@ class PostService:
 
                 hashtags = extract_hashtags(content)
                 hashtag_objs = [
-                    Hashtag.objects.get_or_create(name=name)[0]
-                    for name in hashtags
+                    Hashtag.objects.get_or_create(name=name)[0] for name in hashtags
                 ]
                 post.hashtags.set(hashtag_objs)
 
@@ -51,11 +50,10 @@ class PostService:
         posts = cache.get(CACHE_KEY_PUBLISHED_POSTS)
         if posts is None:
             posts = (
-                Post.objects
-                .select_related('author')
-                .prefetch_related('hashtags')
+                Post.objects.select_related("author")
+                .prefetch_related("posts")
                 .filter(is_published=True)
-                .order_by('-published_at')
+                .order_by("-published_at")
             )
             cache.set(CACHE_KEY_PUBLISHED_POSTS, posts, timeout=CACHE_TIMEOUT)
         return posts
