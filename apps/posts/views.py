@@ -2,11 +2,10 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from django_filters import rest_framework as filters
 
-from apps.posts.models import Post
-from apps.posts.serializers import PostSerializer
-from apps.posts.services import PostService
+from apps.posts import filters as post_filters
+from apps.posts import serializers as post_serializers
+from apps.posts import services  as post_services
 
 
 class PostPagination(PageNumberPagination):
@@ -15,18 +14,7 @@ class PostPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class PostFilter(filters.FilterSet):
-    title = filters.CharFilter(lookup_expr="icontains")
-    content = filters.CharFilter(lookup_expr="icontains")
-    author = filters.NumberFilter()
-    is_published = filters.BooleanFilter()
-
-    class Meta:
-        model = Post
-        fields = ["title", "content", "author", "is_published"]
-
-
-class PostListCreateAPI(generics.ListCreateAPIView):
+class PostView(generics.ListCreateAPIView):
     """
     API endpoint для создания и получения списка постов.
 
@@ -36,27 +24,26 @@ class PostListCreateAPI(generics.ListCreateAPIView):
     - Фильтрацию по заголовку, содержанию, автору и статусу публикации
     """
 
-    serializer_class = PostSerializer
+    serializer_class = post_serializers.PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = PostPagination
-    filterset_class = PostFilter
-    # queryset = Post.objects.none()
+    filterset_class = post_filters.PostFilter
 
     def get_queryset(self):
         """
         Возвращает отфильтрованный и оптимизированный queryset постов.
         Использует select_related и prefetch_related для оптимизации запросов.
         """
-        queryset = PostService.get_published_posts()
+        queryset = post_services.PostService.get_published_posts()
         return self.filterset_class(self.request.GET, queryset=queryset).qs
 
-    def perform_create(self, serializer: PostSerializer):
+    def perform_create(self, serializer: post_serializers.PostSerializer):
         """
         Создает новый пост с использованием PostService.
         Обрабатывает возможные ошибки при создании.
         """
         try:
-            post = PostService.create_post(
+            post = post_services.PostService.create_post(
                 author=self.request.user, **serializer.validated_data
             )
             serializer.instance = post

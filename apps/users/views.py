@@ -4,11 +4,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
 
-from .serializers import UserRegistrationSerializer, UserLoginSerializer
-from .services import AuthService
+from apps.users import serializers as user_serializers
+from apps.users import services as user_services
 
 User = get_user_model()
 
@@ -21,22 +19,20 @@ def register(request):
     """
     Регистрация нового пользователя
     """
-    serializer = UserRegistrationSerializer(data=request.data)
-    if serializer.is_valid():
-        try:
-            user = AuthService.create_user(serializer.validated_data)
-            refresh = RefreshToken.for_user(user)
-            return Response(
-                {
-                    "user": serializer.data,
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                },
-                status=status.HTTP_201_CREATED,
-            )
-        except ValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer = user_serializers.UserRegistrationSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    user = user_services.AuthService.create_user(serializer.validated_data)
+    refresh = RefreshToken.for_user(user)
+
+    return Response(
+        {
+            "user": serializer.data,
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        },
+        status=status.HTTP_201_CREATED,
+    )
 
 
 @api_view(["POST"])
@@ -46,25 +42,21 @@ def login(request):
     Аутентификация пользователя
     """
     # try to use django.contrib.auth.authenticate()
-    serializer = UserLoginSerializer(data=request.data)
-    if serializer.is_valid():
-        try:
-            user = AuthService.authenticate_user(
-                email=serializer.validated_data["email"],
-                password=serializer.validated_data["password"],
-            )
-            refresh = RefreshToken.for_user(user)
-            return Response(
-                {
-                    "user": UserRegistrationSerializer(user).data,
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                }
-            )
-        except ValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer = user_serializers.UserLoginSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    user = user_services.AuthService.authenticate_user(
+        email=serializer.validated_data["email"],
+        password=serializer.validated_data["password"],
+    )
+    refresh = RefreshToken.for_user(user)
 
+    return Response(
+        {
+            "user": user_serializers.UserRegistrationSerializer(user).data,
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        }
+    )
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])

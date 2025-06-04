@@ -41,6 +41,7 @@ class AuthService:
             user = User.objects.get(email=email)
             if not user.check_password(password):
                 raise ValidationError(_('Неверный пароль'))
+
             return user
         except User.DoesNotExist:
             raise ValidationError(_('Пользователь не найден'))
@@ -60,4 +61,5 @@ class AuthService:
         
         user.set_password(new_password)
         user.save()
+
         return user 
