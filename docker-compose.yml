@@ -1,5 +1,9 @@
 version: "3.9"
 
+# Could we use gunicorn ?
+# https://docs.gunicorn.org/en/latest/run.html
+# Create gunicorn.dev.py for config 
+# https://docs.gunicorn.org/en/latest/configure.html#configuration
 services:
   app:
     build: .
@@ -17,7 +21,7 @@ services:
   postgres:
     image: postgres:latest
     environment:
-      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_PASSWORD=12345678  # move to .env use ${POSTGRES_PASSWORD}.
     ports:
       - "5444:5432"
     volumes:
@@ -30,6 +34,8 @@ services:
   
   celery_beat:
     build: .
+    env_file:
+      - .env
     command: "celery -A config beat --loglevel=info"
     depends_on:
       - redis
@@ -38,6 +44,8 @@ services:
 
   celery_worker:
     build: .
+    env_file:
+      - .env
     command: "celery -A config worker --loglevel=info"
     depends_on:
       - redis

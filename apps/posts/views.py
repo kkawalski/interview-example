@@ -11,35 +11,36 @@ from apps.posts.services import PostService
 
 class PostPagination(PageNumberPagination):
     page_size = 10
-    page_size_query_param = 'page_size'
+    page_size_query_param = "page_size"
     max_page_size = 100
 
 
 class PostFilter(filters.FilterSet):
-    title = filters.CharFilter(lookup_expr='icontains')
-    content = filters.CharFilter(lookup_expr='icontains')
+    title = filters.CharFilter(lookup_expr="icontains")
+    content = filters.CharFilter(lookup_expr="icontains")
     author = filters.NumberFilter()
     is_published = filters.BooleanFilter()
 
     class Meta:
         model = Post
-        fields = ['title', 'content', 'author', 'is_published']
+        fields = ["title", "content", "author", "is_published"]
 
 
 class PostListCreateAPI(generics.ListCreateAPIView):
     """
     API endpoint для создания и получения списка постов.
-    
+
     Поддерживает:
     - Создание новых постов (POST)
     - Получение списка постов с пагинацией (GET)
     - Фильтрацию по заголовку, содержанию, автору и статусу публикации
     """
+
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = PostPagination
     filterset_class = PostFilter
-    queryset = Post.objects.none()
+    # queryset = Post.objects.none()
 
     def get_queryset(self):
         """
@@ -56,12 +57,8 @@ class PostListCreateAPI(generics.ListCreateAPIView):
         """
         try:
             post = PostService.create_post(
-                author=self.request.user,
-                **serializer.validated_data
+                author=self.request.user, **serializer.validated_data
             )
             serializer.instance = post
         except Exception as e:
-            return Response(
-                {"detail": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
