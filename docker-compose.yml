@@ -5,18 +5,18 @@ version: "3.9"
 # Create gunicorn.dev.py for config 
 # https://docs.gunicorn.org/en/latest/configure.html#configuration
 services:
-  app:
-    build: .
-    command: >
-      sh -c "python manage.py migrate &&
-            python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - .:/app
-    ports:
-      - "8001:8000"
-    depends_on:
-      - postgres
-      - redis
+  # app:
+  #   build: .
+  #   command: >
+  #     sh -c "python manage.py migrate &&
+  #           python manage.py runserver 0.0.0.0:8000"
+  #   volumes:
+  #     - .:/app
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - postgres
+  #     - redis
   
   postgres:
     image: postgres:latest
@@ -40,7 +40,7 @@ services:
     depends_on:
       - redis
       - postgres
-      - app
+      # - app
 
   celery_worker:
     build: .
@@ -50,7 +50,7 @@ services:
     depends_on:
       - redis
       - postgres
-      - app
+      # - app
       
 volumes:
   postgres_data:

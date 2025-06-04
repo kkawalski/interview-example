@@ -14,12 +14,11 @@ from pathlib import Path
 import os
 from datetime import timedelta
 
-from apps.config import CONFIG
-from apps.security import *
+from config.config import CONFIG
+from config.security import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -31,7 +30,6 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-tfb1^xs8h9r$=*622(!
 DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
 
 # Application definition
 
@@ -53,7 +51,6 @@ INSTALLED_APPS = [
     'django_otp',
     'django_otp.plugins.otp_totp',
     'django_otp.plugins.otp_static',
-    'two_factor',
     *CUSTOM_APPS
 ]
 
@@ -64,7 +61,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_ratelimit.middleware.RatelimitMiddleware',
@@ -89,7 +85,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
@@ -103,7 +98,6 @@ DATABASES = {
         'PORT': CONFIG.postgresql.port,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -157,11 +151,9 @@ CACHES = {
     }
 }
 
-
 # Celery
 CELERY_BROKER_URL = CONFIG.celery.broker_url
 CELERY_RESULT_BACKEND = CONFIG.celery.result_backend
-
 
 # DRF
 REST_FRAMEWORK = {
