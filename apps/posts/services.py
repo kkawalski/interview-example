@@ -5,8 +5,8 @@ from django.core.cache import cache
 from django.db import IntegrityError, transaction
 from rest_framework import exceptions
 
-from apps.posts.models import Hashtag, Post
-from apps.posts.utils.hashtags import extract_hashtags
+from apps.posts import models as post_models
+from apps.posts.utils import hashtags as hashtags_utils
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ class PostService:
     def create_post(author, title, content, publish_at=None):
         try:
             with transaction.atomic():
-                post = Post.objects.create(
+                post = post_models.Post.objects.create(
                     author=author,
                     title=title,
                     content=content,
@@ -27,9 +27,9 @@ class PostService:
                     is_published=publish_at is None,
                 )
 
-                hashtags = extract_hashtags(content)
+                hashtags = hashtags_utils.extract_hashtags(content)
                 hashtag_objs = [
-                    Hashtag.objects.get_or_create(name=name)[0] for name in hashtags
+                    post_models.Hashtag.objects.get_or_create(name=name)[0] for name in hashtags
                 ]
                 post.hashtags.set(hashtag_objs)
 
@@ -50,7 +50,7 @@ class PostService:
         posts = cache.get(CACHE_KEY_PUBLISHED_POSTS)
         if posts is None:
             posts = (
-                Post.objects.select_related("author")
+                post_models.Post.objects.select_related("author")
                 .prefetch_related("posts")
                 .filter(is_published=True)
                 .order_by("-published_at")
